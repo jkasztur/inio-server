@@ -9,7 +9,7 @@ install:
 	npm install
 
 build:
-	node_modules/.bin/tsc 
+	tsc 
 
 clean:
 	find src/ -type f -iname '*.js' -delete
