@@ -1,0 +1,11 @@
+.idea
+/node_modules
+/npm-debug.log
+/build
+/coverage
+/docker-compose.override.yml
+/docker/ssh
+/eb-versions
+/src/**/*.js
+/test/**/*.js
+.npmrc
