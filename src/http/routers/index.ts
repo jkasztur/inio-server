@@ -8,5 +8,11 @@ export function createMainRouter(): Router {
 		ctx.status = 200
 	})
 
+	// fallback
+	router.all('/*', (ctx: Context) => {
+		ctx.status = 404
+		ctx.body = 'Requested method not implemented'
+	})
+
 	return router
 }
