@@ -5,6 +5,9 @@ let server: Server
 export async function start() {
 	server = createServer()
 	const port = Number(process.env.PORT || 5001)
+	console.log('Before listening')
+	console.log(port);
+
 	await server.listenAsync(port)
 }
 
