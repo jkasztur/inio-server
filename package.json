@@ -1,11 +1,18 @@
 {
 	"name": "inio-server",
 	"version": "1.0.0",
+	"engines": {
+		"node": "14.8.0"
+	},
 	"repository": {
 		"type": "git",
 		"url": "git+https://github.com/jkasztur/inio-server.git"
 	},
-	"author": "",
+	"scripts": {
+		"start": "node bin/server.js",
+		"postinstall": "tsc"
+	},
+	"author": "Jan Kasztura",
 	"license": "ISC",
 	"bugs": {
 		"url": "https://github.com/jkasztur/inio-server/issues"
