@@ -1,1 +1,1 @@
-web: make install && make build && make start
+web: make install && ls && make build && make start
