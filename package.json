@@ -10,7 +10,9 @@
 	},
 	"scripts": {
 		"start": "node bin/server.js",
-		"postinstall": "tsc"
+		"start-watch": "ts-node-dev --prefer-ts --respawn --files ./bin/server.js",
+		"postinstall": "tsc",
+		"clean": "find src/ -type f -iname '*.js' -delete"
 	},
 	"author": "Jan Kasztura",
 	"license": "ISC",

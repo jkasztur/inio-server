@@ -4,7 +4,7 @@ let server: Server
 
 export async function start() {
 	server = createServer()
-	const port = Number(process.env.PORT || 5001)
+	const port = Number(process.env.PORT || 5000)
 	await server.listenAsync(port)
 }
 
