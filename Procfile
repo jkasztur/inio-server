@@ -1,1 +1,1 @@
-web: make install && ls && make build && make start
+web: make install && ls node_modules && node_modules/.bin && make build && make start
