@@ -4,7 +4,6 @@ PATH := node_modules/.bin:$(PATH)
 
 default:
 
-
 install:
 	rm -rf node_modules
 	npm install
