@@ -1,10 +1,18 @@
 import Koa from 'koa'
 import http from 'http'
 import { createMainRouter } from './routers'
+import koaBody from 'koa-body'
+import { createAuthRouter } from './routers/api/auth'
 
 function createKoa(): Koa {
-	const app = new Koa()
+	const app = new Koa<Koa.DefaultState, BaseContext>()
+	decorateContext(app.context)
+	app.use(koaBody({
+		jsonLimit: '10mb',
+		onError: (err, ctx) => ctx.throw(400, err),
+	}))
 
+	app.use(createAuthRouter().routes())
 	app.use(createMainRouter().routes())
 
 	return app
@@ -39,5 +47,18 @@ export class Server extends http.Server {
 				resolve()
 			}, timeout)
 		})
+	}
+}
+
+export interface BaseContext extends Koa.BaseContext {
+	send(data?: any, statusCode?: number): void
+}
+
+function decorateContext(context: BaseContext) {
+	context.send = function send(data = {}, status = null) {
+		this.body = data
+		if (status) {
+			this.status = status
+		}
 	}
 }

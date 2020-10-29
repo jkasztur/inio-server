@@ -1,17 +1,16 @@
-import { Context } from "koa";
+
 import Router from "koa-router";
+import { Context } from "../types";
 
 export function createMainRouter(): Router {
 	const router = new Router()
 
 	router.get('/status', (ctx: Context) => {
-		ctx.body = { ok: true }
-		ctx.status = 200
+		ctx.send({ ok: true }, 200)
 	})
 
 	router.use((ctx: Context) => {
-		ctx.body = 'Method not implemented'
-		ctx.status = 400
+		ctx.throw('Method not implemented', 404)
 	})
 
 	return router

@@ -1,3 +1,4 @@
+require('dotenv').config()
 require('source-map-support').install()
 const bootstrap = require('../src/bootstrap')
 
