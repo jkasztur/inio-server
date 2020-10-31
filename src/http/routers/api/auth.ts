@@ -2,6 +2,8 @@ import { Context } from "../../types";
 import Router from "koa-router";
 import { Account } from "../../../database/models/Account";
 import * as argon2 from 'argon2';
+import validate from "../../middleware/validate";
+import Joi from "@hapi/joi";
 
 /**
  * @injectable(http.router.auth)
@@ -11,7 +13,12 @@ export function createAuthRouter(): Router {
 		prefix: '/auth'
 	})
 
-	router.post('/register', async (ctx: Context) => {
+	router.post('/register', validate({
+		body: {
+			userName: Joi.string().required(),
+			password: Joi.string().required()
+		}
+	}), async (ctx: Context) => {
 		const { userName, password } = ctx.request.body
 		const existing: Account = await Account.findOne({
 			where: {
@@ -28,7 +35,12 @@ export function createAuthRouter(): Router {
 		ctx.send({ ok: true }, 204)
 	})
 
-	router.post('/login', async (ctx: Context) => {
+	router.post('/login', validate({
+		body: {
+			userName: Joi.string().required(),
+			password: Joi.string().required()
+		}
+	}), async (ctx: Context) => {
 		const { userName, password } = ctx.request.body
 		const account: Account = await Account.findOne({
 			where: {
