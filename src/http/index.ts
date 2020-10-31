@@ -2,6 +2,7 @@ import Koa from 'koa'
 import http from 'http'
 import koaBody from 'koa-body'
 import Router from 'koa-router'
+import cors from './middleware/cors'
 
 /**
  * @injectable(http.koa)
@@ -15,6 +16,7 @@ export function createKoa(authRouter: Router, mainRouter: Router): Koa {
 		jsonLimit: '10mb',
 		onError: (err, ctx) => ctx.throw(400, err),
 	}))
+	app.use(cors())
 
 	app.use(authRouter.routes())
 	app.use(mainRouter.routes())
