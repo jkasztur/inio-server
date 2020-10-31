@@ -18,7 +18,7 @@ export function createMainRouter(dbClient: Sequelize): Router {
 		} catch (err) {
 			dbStatus = err.message
 		}
-		ctx.send({ ok: true, dbStatus }, 200)
+		ctx.send({ ok: true, db: dbStatus }, 200)
 	})
 
 	router.use((ctx: Context) => {

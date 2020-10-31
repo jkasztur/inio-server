@@ -1,7 +1,7 @@
 import { Context } from "../../types";
 import Router from "koa-router";
-
-const db = {}
+import { Account } from "../../../database/models/Account";
+import * as argon2 from 'argon2';
 
 /**
  * @injectable(http.router.auth)
@@ -11,19 +11,36 @@ export function createAuthRouter(): Router {
 		prefix: '/auth'
 	})
 
-	router.post('/register', (ctx: Context) => {
+	router.post('/register', async (ctx: Context) => {
 		const { userName, password } = ctx.request.body
-		if (db[userName]) {
+		const existing: Account = await Account.findOne({
+			where: {
+				userName
+			}
+		})
+		if (existing) {
 			ctx.throw('Username already exists', 400)
-		} else {
-			db[userName] = password
-			ctx.send(200)
 		}
+		const hashedPassword = argon2.hash(password)
+		await Account.create({
+			userName, password: hashedPassword
+		})
+		ctx.send({ ok: true }, 204)
 	})
 
-	router.post('/login', (ctx: Context) => {
+	router.post('/login', async (ctx: Context) => {
 		const { userName, password } = ctx.request.body
-		if (db[userName]) {
+		const account: Account = await Account.findOne({
+			where: {
+				userName
+			}
+		})
+		if (!account) {
+			ctx.send('Account not found', 404)
+			return
+		}
+		const isMatch = await argon2.verify(account.password, password)
+		if (isMatch) {
 			ctx.send(200)
 			return
 		} else {
