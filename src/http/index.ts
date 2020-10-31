@@ -1,10 +1,14 @@
 import Koa from 'koa'
 import http from 'http'
-import { createMainRouter } from './routers'
 import koaBody from 'koa-body'
-import { createAuthRouter } from './routers/api/auth'
+import Router from 'koa-router'
 
-function createKoa(): Koa {
+/**
+ * @injectable(http.koa)
+ * @param authRouter @inject(http.router.auth)
+ * @param mainRouter @inject(http.router.main)
+ */
+export function createKoa(authRouter: Router, mainRouter: Router): Koa {
 	const app = new Koa<Koa.DefaultState, BaseContext>()
 	decorateContext(app.context)
 	app.use(koaBody({
@@ -12,14 +16,17 @@ function createKoa(): Koa {
 		onError: (err, ctx) => ctx.throw(400, err),
 	}))
 
-	app.use(createAuthRouter().routes())
-	app.use(createMainRouter().routes())
+	app.use(authRouter.routes())
+	app.use(mainRouter.routes())
 
 	return app
 }
 
-export function createServer(): Server {
-	const koa = createKoa()
+/**
+ * @injectable(http.server)
+ * @param koa @inject(http.koa)
+ */
+export function createServer(koa: Koa): Server {
 	const server = new Server(koa.callback())
 
 	return server

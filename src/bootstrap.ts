@@ -1,14 +1,22 @@
-import { createServer, Server } from './http'
+import { Container } from 'node-injectable'
+import { Sequelize } from 'sequelize/types'
+import { Server } from './http'
 
-let server: Server
+let container: Container
 
 export async function start() {
-	server = createServer()
-	const port = Number(process.env.PORT || 5000)
-	await server.listenAsync(port)
+	container = new Container()
+	container.add('container', container)
+	// build DI container
+	await container.lookup(process.env.TS_NODE_DEV ? __dirname + '/**/*.ts' : __dirname + '/**/*.js')
+	const server: Server = container.get('http.server')
+	await server.listenAsync(Number(process.env.PORT))
 }
 
 export async function stop() {
+	const dbClient: Sequelize = container.get('database.client')
+	await dbClient.close()
+	const server: Server = container.get('http.server')
 	await server.shutdownAsync()
 }
 

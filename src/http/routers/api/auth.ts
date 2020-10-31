@@ -3,6 +3,9 @@ import Router from "koa-router";
 
 const db = {}
 
+/**
+ * @injectable(http.router.auth)
+ */
 export function createAuthRouter(): Router {
 	const router = new Router({
 		prefix: '/auth'
