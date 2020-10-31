@@ -4,12 +4,11 @@ import { Account } from "./models/Account";
 /**
  * @injectable(database.client)
  */
-export async function createDatabaseClient(): Promise<Sequelize> {
+export function createDatabaseClient(): Sequelize {
 	const client = new Sequelize(process.env.DATABASE_URL, {
 		dialect: 'postgres'
 	})
 
 	client.addModels([Account])
-	await client.sync()
 	return client
 }

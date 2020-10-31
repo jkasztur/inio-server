@@ -9,6 +9,9 @@ export async function start() {
 	container.add('container', container)
 	// build DI container
 	await container.lookup(process.env.TS_NODE_DEV ? __dirname + '/**/*.ts' : __dirname + '/**/*.js')
+
+	const dbClient: Sequelize = container.get('database.client')
+	await dbClient.sync()
 	const server: Server = container.get('http.server')
 	await server.listenAsync(Number(process.env.PORT))
 }
