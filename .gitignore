@@ -9,4 +9,3 @@
 /src/**/*.js
 /test/**/*.js
 .npmrc
-.env
