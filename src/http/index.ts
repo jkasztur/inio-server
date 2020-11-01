@@ -2,7 +2,7 @@ import Koa from 'koa'
 import http from 'http'
 import koaBody from 'koa-body'
 import Router from 'koa-router'
-import cors from './middleware/cors'
+import cors from '@koa/cors'
 
 /**
  * @injectable(http.koa)
@@ -12,11 +12,11 @@ import cors from './middleware/cors'
 export function createKoa(authRouter: Router, mainRouter: Router): Koa {
 	const app = new Koa<Koa.DefaultState, BaseContext>()
 	decorateContext(app.context)
+	app.use(cors)
 	app.use(koaBody({
 		jsonLimit: '10mb',
 		onError: (err, ctx) => ctx.throw(400, err),
 	}))
-	app.use(cors())
 
 	app.use(authRouter.routes())
 	app.use(mainRouter.routes())
