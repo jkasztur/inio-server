@@ -28,7 +28,7 @@ export function createAuthRouter(): Router {
 		if (existing) {
 			ctx.throw('Username already exists', 400)
 		}
-		const hashedPassword = argon2.hash(password)
+		const hashedPassword = await argon2.hash(password)
 		await Account.create({
 			userName, password: hashedPassword
 		})
