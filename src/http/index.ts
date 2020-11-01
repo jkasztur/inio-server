@@ -12,7 +12,7 @@ import cors from '@koa/cors'
 export function createKoa(authRouter: Router, mainRouter: Router): Koa {
 	const app = new Koa<Koa.DefaultState, BaseContext>()
 	decorateContext(app.context)
-	app.use(cors)
+	app.use(cors())
 	app.use(koaBody({
 		jsonLimit: '10mb',
 		onError: (err, ctx) => ctx.throw(400, err),
