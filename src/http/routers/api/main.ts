@@ -21,6 +21,10 @@ export function createMainRouter(dbClient: Sequelize): Router {
 		ctx.send({ ok: true, db: dbStatus }, 200)
 	})
 
+	router.options('/*', (ctx: Context) => {
+		ctx.send({ ok: true }, 200)
+	})
+
 	router.use((ctx: Context) => {
 		ctx.throw('Method not implemented', 404)
 	})
