@@ -36,7 +36,7 @@ export function createServer(koa: Koa): Server {
 
 export class Server extends http.Server {
 	async listenAsync(port: number = 5000) {
-		return new Promise((resolve, reject) => {
+		return new Promise<void>((resolve, reject) => {
 			this.listen(port)
 			this.once('listening', () => {
 				console.log(`Server listening on port ${port}`)
@@ -50,7 +50,7 @@ export class Server extends http.Server {
 	}
 
 	async shutdownAsync(timeout: number = 100) {
-		return new Promise((resolve) => {
+		return new Promise<void>((resolve) => {
 			this.close()
 			setTimeout(() => {
 				resolve()

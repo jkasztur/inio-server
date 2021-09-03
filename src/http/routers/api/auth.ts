@@ -3,7 +3,7 @@ import Router from "koa-router";
 import { Account } from "../../../database/models/Account";
 import * as argon2 from 'argon2';
 import validate from "../../middleware/validate";
-import Joi from "@hapi/joi";
+import Joi from "joi";
 
 /**
  * @injectable(http.router.auth)
