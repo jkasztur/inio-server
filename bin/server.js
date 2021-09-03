@@ -17,5 +17,6 @@ process.on('SIGTERM', async () => {
 })
 
 bootstrap.start().catch((err) => {
+	console.error(err)
 	bootstrap.terminate(1)
 })
