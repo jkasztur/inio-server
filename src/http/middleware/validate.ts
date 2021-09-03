@@ -1,4 +1,4 @@
-import Joi, { ValidationOptions } from '@hapi/joi'
+import Joi, { ValidationOptions } from 'joi'
 
 export default (data: IValidationData, options: ValidationOptions = {}) => {
 	if (!options.hasOwnProperty('stripUnknown')) {
