@@ -11,8 +11,6 @@ export async function start() {
 	// build DI container
 	await container.lookup(__dirname + '/**/*.js')
 
-	const dbClient: Sequelize = container.get('database.client')
-	await dbClient.sync()
 	const server: Server = container.get('http.server')
 	await server.listenAsync(Number(process.env.PORT))
 	console.log('Server started')

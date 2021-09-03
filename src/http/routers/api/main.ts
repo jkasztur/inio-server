@@ -1,19 +1,16 @@
 
 import Router from "koa-router";
-import { Sequelize } from "sequelize/types";
 import { Context } from "../../types";
 
 /**
  * @injectable(http.router.main)
- * @param dbClient @inject(database.client)
  */
-export function createMainRouter(dbClient: Sequelize): Router {
+export function createMainRouter(): Router {
 	const router = new Router()
 
 	router.get('/status', async (ctx: Context) => {
 		let dbStatus: string
 		try {
-			await dbClient.authenticate()
 			dbStatus = 'Database connected successfuly'
 		} catch (err) {
 			dbStatus = err.message

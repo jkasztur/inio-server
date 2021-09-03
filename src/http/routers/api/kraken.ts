@@ -1,6 +1,5 @@
 
 import Router from "koa-router";
-import { Sequelize } from "sequelize/types";
 import { IConnector } from "../../../modules/types";
 import { Context } from "../../types";
 
