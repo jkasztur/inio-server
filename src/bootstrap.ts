@@ -9,7 +9,7 @@ export async function start() {
 	container = new Container()
 	container.add('container', container)
 	// build DI container
-	await container.lookup(__dirname + '/**/*.js')
+	await container.lookup(process.env.TS_NODE_DEV ? __dirname + '/**/*.ts' : __dirname + '/**/*.js')
 
 	const server: Server = container.get('http.server')
 	await server.listenAsync(Number(process.env.PORT))
