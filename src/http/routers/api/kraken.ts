@@ -14,7 +14,7 @@ export function createMainRouter(connector: IConnector): Router {
 
 	router.get('/balance', async (ctx: Context) => {
 		const balance = await connector.getBalance()
-		ctx.send({ balance }, 200)
+		ctx.send(balance, 200)
 	})
 
 	router.use((ctx: Context) => {
