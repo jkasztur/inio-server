@@ -6,10 +6,11 @@ import cors from '@koa/cors'
 
 /**
  * @injectable(http.koa)
- * @param mainRouter @inject(http.router.main)
- * @param krakenRouter @inject(http.router.kraken)
+ * @param main @inject(http.router.main)
+ * @param auth @inject(http.router.auth)
+ * @param kraken @inject(http.router.kraken)
  */
-export function createKoa(mainRouter: Router, krakenRouter: Router): Koa {
+export function createKoa(main: Router, auth: Router, kraken: Router): Koa {
 	const app = new Koa<Koa.DefaultState, BaseContext>()
 	decorateContext(app.context)
 	app.use(cors())
@@ -18,8 +19,9 @@ export function createKoa(mainRouter: Router, krakenRouter: Router): Koa {
 		onError: (err, ctx) => ctx.throw(400, err),
 	}))
 
-	app.use(mainRouter.routes())
-	app.use(krakenRouter.routes())
+	app.use(main.routes())
+	app.use(auth.routes())
+	app.use(kraken.routes())
 
 	return app
 }

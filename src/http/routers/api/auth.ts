@@ -1,14 +1,14 @@
 import { Context } from "../../types";
 import Router from "koa-router";
-import { Account } from "../../../database/models/Account";
-import * as argon2 from 'argon2';
 import validate from "../../middleware/validate";
 import Joi from "joi";
+import { AuthService, LoginStatus } from "../../../app/authService";
 
 /**
  * @injectable(http.router.auth)
+ * @param authService @inject(app.authService)
  */
-export function createAuthRouter(): Router {
+export function createAuthRouter(authService: AuthService): Router {
 	const router = new Router({
 		prefix: '/auth'
 	})
@@ -20,19 +20,12 @@ export function createAuthRouter(): Router {
 		}
 	}), async (ctx: Context) => {
 		const { userName, password } = ctx.request.body
-		const existing: Account = await Account.findOne({
-			where: {
-				userName
-			}
-		})
-		if (existing) {
+		const result = await authService.register(userName, password)
+		if (result.status === LoginStatus.AlreadyExists) {
 			ctx.throw('Username already exists', 409)
 		}
-		const hashedPassword = await argon2.hash(password)
-		await Account.create({
-			userName, password: hashedPassword
-		})
-		ctx.send({ ok: true }, 204)
+		ctx.cookies.set('accessToken', result.accessToken)
+		ctx.send(null, 204)
 	})
 
 	router.post('/login', validate({
@@ -42,22 +35,16 @@ export function createAuthRouter(): Router {
 		}
 	}), async (ctx: Context) => {
 		const { userName, password } = ctx.request.body
-		const account: Account = await Account.findOne({
-			where: {
-				userName
-			}
-		})
-		if (!account) {
-			ctx.send('Account not found', 404)
-			return
+		const result = await authService.login(userName, password)
+
+		if (result.status === LoginStatus.NotFound) {
+			ctx.throw('Account not found', 404)
 		}
-		const isMatch = await argon2.verify(account.password, password)
-		if (isMatch) {
-			ctx.send(200)
-			return
-		} else {
-			ctx.throw(403)
+		if (result.status === LoginStatus.InvalidPassword) {
+			ctx.throw('Invalid password', 403)
 		}
+		ctx.cookies.set('accessToken', result.accessToken)
+		ctx.send(null, 204)
 	})
 
 	return router

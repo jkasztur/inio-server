@@ -11,6 +11,7 @@ export async function start() {
 	// build DI container
 	await container.lookup(process.env.TS_NODE_DEV ? __dirname + '/**/*.ts' : __dirname + '/**/*.js')
 
+	container.get('database.client')
 	const server: Server = container.get('http.server')
 	await server.listenAsync(Number(process.env.PORT))
 	console.log('Server started')
