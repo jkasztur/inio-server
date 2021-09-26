@@ -25,7 +25,7 @@ export function createAuthRouter(authService: AuthService): Router {
 			ctx.throw('Username already exists', 409)
 		}
 		ctx.cookies.set('accessToken', result.accessToken)
-		ctx.send(null, 204)
+		ctx.send({ accessToken: result.accessToken }, 200)
 	})
 
 	router.post('/login', validate({
@@ -44,7 +44,7 @@ export function createAuthRouter(authService: AuthService): Router {
 			ctx.throw('Invalid password', 403)
 		}
 		ctx.cookies.set('accessToken', result.accessToken)
-		ctx.send(null, 204)
+		ctx.send({ accessToken: result.accessToken }, 200)
 	})
 
 	return router
