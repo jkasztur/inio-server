@@ -14,7 +14,7 @@ export function createMainRouter(sequelize: Sequelize): Router {
 	router.get('/status', async (ctx: Context) => {
 		const dbStatus: number = await check(
 			() => sequelize.authenticate(),
-			(err) => console.error(err)
+			(err) => console.log({ err }, 'Error when connecting to DB')
 		)
 		ctx.send({ ok: true, db: dbStatus }, 200)
 	})
