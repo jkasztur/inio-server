@@ -19,7 +19,7 @@ export function createKoa(main: Router, auth: Router, kraken: Router, fallback):
 	app.use(cors({
 		origin: (ctx) => ctx.get('origin'),
 		credentials: true,
-		allowHeaders: ['X-Request, X-Requested-With, Content-Type, Cookie, Authorization']
+		allowHeaders: ['X-Request, X-Requested-With, Content-Type, Cookie, Authorization', 'x-access-token']
 	}))
 	app.use(koaBody({
 		jsonLimit: '10mb',

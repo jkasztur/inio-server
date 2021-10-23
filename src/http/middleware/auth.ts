@@ -4,7 +4,7 @@ import HttpStatus from 'http-status-codes'
 export default () => {
 
 	return async function auth(ctx: Context, next: () => any) {
-		const accessToken = ctx.cookies.get('accessToken')
+		const accessToken = ctx.headers['x-access-token']
 		if (!accessToken) {
 			ctx.throw('No access token', HttpStatus.UNAUTHORIZED)
 		}
