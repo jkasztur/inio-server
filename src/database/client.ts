@@ -6,7 +6,8 @@ import { Account } from "./models/Account";
  */
 export function createDatabaseClient(): Sequelize {
 	const client = new Sequelize(process.env.DATABASE_URL, {
-		dialect: 'postgres'
+		dialect: 'postgres',
+		ssl: true
 	})
 
 	client.addModels([Account])
