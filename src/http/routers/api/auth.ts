@@ -24,7 +24,7 @@ export function createAuthRouter(authService: AuthService): Router {
 		if (result.status === LoginStatus.AlreadyExists) {
 			ctx.throw('Username already exists', 409)
 		}
-		ctx.cookies.set('accessToken', result.accessToken)
+		ctx.cookies.set('accessToken', result.accessToken, { domain: process.env.DOMAIN })
 		ctx.send({ accessToken: result.accessToken }, 200)
 	})
 
