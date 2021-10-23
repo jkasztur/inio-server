@@ -15,7 +15,7 @@ export class Account extends Model<Account> {
 	@Column({
 		type: DataType.STRING(100)
 	})
-	userName: string
+	username: string
 
 	@AllowNull(false)
 	@Column({

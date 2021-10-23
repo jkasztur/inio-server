@@ -8,10 +8,10 @@ export class AuthService {
 	 */
 	constructor() { }
 
-	public async register(userName: string, password: string): Promise<LoginResponse> {
+	public async register(username: string, password: string): Promise<LoginResponse> {
 		const existing: Account = await Account.findOne({
 			where: {
-				userName
+				username
 			}
 		})
 		if (existing) {
@@ -19,7 +19,7 @@ export class AuthService {
 		}
 		const hashedPassword = await argon2.hash(password)
 		const account = await Account.create({
-			userName, password: hashedPassword
+			username, password: hashedPassword
 		})
 		const accessToken = await this.createAccessToken(account.id)
 		return {
@@ -28,10 +28,10 @@ export class AuthService {
 		}
 	}
 
-	public async login(userName: string, password: string): Promise<LoginResponse> {
+	public async login(username: string, password: string): Promise<LoginResponse> {
 		const account: Account = await Account.findOne({
 			where: {
-				userName
+				username
 			}
 		})
 		if (!account) {
