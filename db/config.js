@@ -1,12 +1,8 @@
-import { Sequelize } from "sequelize-typescript";
-import { Account } from "./models/Account";
-
-/**
- * @injectable(database.client)
- */
-export function createDatabaseClient(): Sequelize {
-	const client = new Sequelize({
+require('dotenv').config()
+module.exports = {
+	production: {
 		host: process.env.POSTGRES_HOST,
+		port: Number.parseInt(process.env.POSTGRES_PORT || '5432'),
 		username: process.env.POSTGRES_USERNAME,
 		password: process.env.POSTGRES_PASSWORD,
 		database: process.env.POSTGRES_DB,
@@ -16,9 +12,6 @@ export function createDatabaseClient(): Sequelize {
 			ssl: {
 				rejectUnauthorized: false
 			}
-		}
-	})
-
-	client.addModels([Account])
-	return client
+		},
+	}
 }
