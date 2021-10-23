@@ -11,6 +11,11 @@ export function createDatabaseClient(): Sequelize {
 		password: process.env.POSTGRES_PASSWORD,
 		database: process.env.POSTGRES_DB,
 		dialect: 'postgres',
+		define: {
+			charset: 'utf8',
+			collate: 'utf8_unicode_ci',
+			freezeTableName: true,
+		},
 		dialectOptions: {
 			timezone: 'Etc/UTC',
 			ssl: {

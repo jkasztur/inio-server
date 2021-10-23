@@ -15,7 +15,8 @@
 		"start:local": "ts-node-dev --prefer-ts --respawn --files ./bin/server.js",
 		"postinstall": "tsc",
 		"clean": "find src/ -type f -iname '*.js' -delete",
-		"db:migrate": "sequelize-cli db:migrate"
+		"db:migrate": "sequelize-cli db:migrate",
+		"db:migration:generate": "sequelize-cli migration:generate --name=temp"
 	},
 	"author": "Jan Kasztura",
 	"license": "ISC",

@@ -1,7 +1,9 @@
 import { Model, AllowNull, DataType, AutoIncrement } from 'sequelize-typescript'
 import { Table, Column, PrimaryKey } from 'sequelize-typescript'
 
-@Table
+@Table({
+	tableName: 'accounts',
+})
 export class Account extends Model<Account> {
 
 	@AutoIncrement
@@ -20,8 +22,4 @@ export class Account extends Model<Account> {
 		type: DataType.STRING(100)
 	})
 	password: string
-
-	@AllowNull(true)
-	@Column
-	createdAt: Date
 }
