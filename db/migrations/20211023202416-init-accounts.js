@@ -16,10 +16,6 @@ module.exports = {
 				type: Sequelize.STRING(100),
 				allowNull: false
 			},
-			platform: {
-				type: Sequelize.STRING(16),
-				allowNull: false
-			},
 			createdAt: {
 				type: Sequelize.DATE,
 				allowNull: false,
