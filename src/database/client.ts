@@ -8,7 +8,9 @@ export function createDatabaseClient(): Sequelize {
 	const client = new Sequelize(process.env.DATABASE_URL, {
 		dialect: 'postgres',
 		dialectOptions: {
-			ssl: true
+			ssl: {
+				rejectUnauthorized: false
+			}
 		}
 	})
 
