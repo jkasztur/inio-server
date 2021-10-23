@@ -2,17 +2,20 @@ import Koa from 'koa'
 import http from 'http'
 import koaBody from 'koa-body'
 import Router from 'koa-router'
-import cors from '@koa/cors'
+import cors from './middleware/cors'
+import log from './middleware/log'
 
 /**
  * @injectable(http.koa)
  * @param main @inject(http.router.main)
  * @param auth @inject(http.router.auth)
  * @param kraken @inject(http.router.kraken)
+ * @param fallback @inject(http.router.fallback)
  */
-export function createKoa(main: Router, auth: Router, kraken: Router): Koa {
+export function createKoa(main: Router, auth: Router, kraken: Router, fallback): Koa {
 	const app = new Koa<Koa.DefaultState, BaseContext>()
 	decorateContext(app.context)
+	app.use(log())
 	app.use(cors())
 	app.use(koaBody({
 		jsonLimit: '10mb',
@@ -22,6 +25,8 @@ export function createKoa(main: Router, auth: Router, kraken: Router): Koa {
 	app.use(main.routes())
 	app.use(auth.routes())
 	app.use(kraken.routes())
+
+	app.use(fallback.routes())
 
 	return app
 }
