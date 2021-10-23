@@ -2,7 +2,7 @@ import Koa from 'koa'
 import http from 'http'
 import koaBody from 'koa-body'
 import Router from 'koa-router'
-import cors from './middleware/cors'
+import cors from '@koa/cors'
 import log from './middleware/log'
 
 /**
@@ -16,7 +16,10 @@ export function createKoa(main: Router, auth: Router, kraken: Router, fallback):
 	const app = new Koa<Koa.DefaultState, BaseContext>()
 	decorateContext(app.context)
 	app.use(log())
-	app.use(cors())
+	app.use(cors({
+		origin: (ctx) => ctx.get('origin'),
+		credentials: true,
+	}))
 	app.use(koaBody({
 		jsonLimit: '10mb',
 		onError: (err, ctx) => ctx.throw(400, err),

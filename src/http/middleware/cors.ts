@@ -3,6 +3,7 @@ import { Context } from "../types"
 export default () => {
 
 	return async function auth(ctx: Context, next: () => any) {
+
 		ctx.set('Access-Control-Allow-Origin', ctx.get('origin'))
 		ctx.set('Access-Control-Allow-Credentials', 'true')
 		ctx.set('Access-Control-Allow-Methods', 'POST, OPTIONS, GET, PATCH')

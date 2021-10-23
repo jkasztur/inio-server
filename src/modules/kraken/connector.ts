@@ -45,9 +45,11 @@ export class KrakenConnector implements IConnector {
 	}
 
 	private sumBalances(response: TradeBalanceResponse): number {
-		return Object.values(response.result).reduce<number>((total, current) => {
+		const sum = Object.values(response.result).reduce<number>((total, current) => {
 			return total + Number.parseFloat(current)
 		}, 0)
+
+		return parseFloat(sum.toFixed(2))
 	}
 }
 
