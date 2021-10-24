@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
 import { Account } from "./models/Account";
+import { KrakenCredentials } from "./models/KrakenCredentials";
 
 /**
  * @injectable(database.client)
@@ -24,6 +25,9 @@ export function createDatabaseClient(): Sequelize {
 		}
 	})
 
-	client.addModels([Account])
+	client.addModels([
+		Account,
+		KrakenCredentials
+	])
 	return client
 }

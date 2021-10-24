@@ -24,7 +24,8 @@ export class AuthService {
 		const accessToken = await this.createAccessToken(account.id)
 		return {
 			status: LoginStatus.Ok,
-			accessToken
+			accessToken,
+			accountId: account.id
 		}
 	}
 
@@ -44,7 +45,8 @@ export class AuthService {
 		const accessToken = await this.createAccessToken(account.id)
 		return {
 			status: LoginStatus.Ok,
-			accessToken
+			accessToken,
+			accountId: account.id
 		}
 	}
 
@@ -56,6 +58,7 @@ export class AuthService {
 type LoginResponse = {
 	status: LoginStatus,
 	accessToken?: string
+	accountId?: number
 }
 
 export enum LoginStatus {

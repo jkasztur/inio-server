@@ -1,7 +1,9 @@
 
+import Joi from "joi";
 import Router from "koa-router";
 import { IConnector } from "../../../modules/types";
 import auth from "../../middleware/auth";
+import validate from "../../middleware/validate";
 import { Context } from "../../types";
 
 /**
@@ -15,8 +17,17 @@ export function createMainRouter(connector: IConnector): Router {
 	router.use(auth())
 
 	router.get('/balance', async (ctx: Context) => {
-		const balance = await connector.getBalance()
+		const balance = await connector.getBalance(Number.parseInt(ctx.headers['x-account-id'] as string))
 		ctx.send(balance, 200)
+	})
+
+	router.post('/setup', validate({
+		body: {
+			apiKey: Joi.string().required(),
+			secret: Joi.string().required()
+		}
+	}), async (ctx: Context) => {
+
 	})
 
 	return router

@@ -1,29 +1,38 @@
 import { IConnector } from "../types";
 import { AxiosInstance } from "axios";
 import crypto from 'crypto'
+import { KrakenCredentials } from "../../database/models/KrakenCredentials";
 
-export class KrakenConnector implements IConnector {
+export class KrakenConnector implements IConnector<KrakenSetup> {
 
-	key: string
-	secret: string
 	/**
 	 * @injectable(modules.kraken.connector)
 	 * @param client @inject(clients.kraken)
 	 */
 	constructor(private client: AxiosInstance) {
-		this.key = 'BoGIAuCT3iF4KRDAxKRw4s2yEbml8wy+378gkauKRGTtOEsM0pQ8fDQk'
-		this.secret = 'Aku3pYBBrHdiC7Y/SobY+wP/RT7wtkmPUbAvrcgpshmqPEmAg87q7W90gQxa/gQIbbCztazaprrGzpI41d61cA=='
 	}
 
-	async getBalance() {
+	async getBalance(accountId: number) {
+		const credentials = await KrakenCredentials.findOne({
+			where: {
+				account_id: accountId
+			}
+		})
+		if (!credentials) {
+			return {
+				amount: -1,
+				currency: 'USD'
+			}
+		}
+
 		const params = new URLSearchParams()
 		params.append('nonce', String(new Date().getTime()))
 		params.append('asset', 'ZUSD')
 
-		const apiSign = this.getApiSign(this.secret, '/0/private/TradeBalance', params)
+		const apiSign = this.getApiSign(credentials.secret, '/0/private/TradeBalance', params)
 		const response = await this.client.post('/0/private/TradeBalance', params, {
 			headers: {
-				'API-Key': this.key,
+				'API-Key': credentials.api_key,
 				'API-Sign': apiSign
 			}
 		})
@@ -31,6 +40,27 @@ export class KrakenConnector implements IConnector {
 		return {
 			amount: this.sumBalances(response.data),
 			currency: 'USD'
+		}
+	}
+
+	async setup(accountId: number, data: KrakenSetup) {
+		const existing: KrakenCredentials = await KrakenCredentials.findOne({
+			where: {
+				account_id: accountId
+			}
+		})
+
+		if (existing) {
+			await existing.update({
+				api_key: data.apikey,
+				secret: data.secret
+			})
+		} else {
+			await KrakenCredentials.create({
+				account_id: accountId,
+				api_key: data.apikey,
+				secret: data.secret
+			})
 		}
 	}
 
@@ -57,4 +87,9 @@ type TradeBalanceResponse = {
 	result: {
 		[key: string]: string
 	}
+}
+
+type KrakenSetup = {
+	apikey: string,
+	secret: string
 }

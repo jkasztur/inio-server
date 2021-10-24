@@ -1,6 +1,7 @@
 
-export interface IConnector {
-	getBalance(): Promise<Balance>
+export interface IConnector<SetupData = object> {
+	getBalance(accountId: number): Promise<Balance>
+	setup(accountId: number, data: SetupData): Promise<void>
 }
 
 export type Balance = {
