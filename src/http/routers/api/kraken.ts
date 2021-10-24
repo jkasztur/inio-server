@@ -27,7 +27,8 @@ export function createMainRouter(connector: IConnector): Router {
 			secret: Joi.string().required()
 		}
 	}), async (ctx: Context) => {
-
+		await connector.setup(Number.parseInt(ctx.headers['x-account-id'] as string), ctx.request.body)
+		ctx.send(null, 200)
 	})
 
 	return router

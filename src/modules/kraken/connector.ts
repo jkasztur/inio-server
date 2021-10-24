@@ -52,13 +52,13 @@ export class KrakenConnector implements IConnector<KrakenSetup> {
 
 		if (existing) {
 			await existing.update({
-				api_key: data.apikey,
+				api_key: data.apiKey,
 				secret: data.secret
 			})
 		} else {
 			await KrakenCredentials.create({
 				account_id: accountId,
-				api_key: data.apikey,
+				api_key: data.apiKey,
 				secret: data.secret
 			})
 		}
@@ -90,6 +90,6 @@ type TradeBalanceResponse = {
 }
 
 type KrakenSetup = {
-	apikey: string,
+	apiKey: string,
 	secret: string
 }
