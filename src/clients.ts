@@ -17,3 +17,12 @@ export function createBinanceClient() {
 		baseURL: 'https://api1.binance.com'
 	})
 }
+
+/**
+ * @injectable(modules.eth.client)
+ */
+export function createEthClient() {
+	return axios.create({
+		baseURL: 'https://api1.binance.com'
+	})
+}

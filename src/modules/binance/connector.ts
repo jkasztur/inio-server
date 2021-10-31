@@ -68,8 +68,6 @@ export class BinanceConnector implements IConnector<ApiSecretSetup> {
 			}
 			if (baseAmount > 0) {
 				const converted = await this.binanceService.getAveragePrice(asset.baseAsset.asset, baseAmount)
-				console.log(converted);
-
 				total += converted
 			}
 		}
