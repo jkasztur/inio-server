@@ -1,4 +1,4 @@
-import { IConnector } from "../types";
+import { ApiSecretSetup, IConnector } from "../types";
 import { AxiosInstance } from "axios";
 import { CurrencyService } from "../../app/currencyService";
 import crypto from 'crypto'
@@ -6,7 +6,7 @@ import qs from "qs";
 import { BinanceCredentials } from "../../database/models/BinanceCredentials";
 import { BinanceService } from "./service";
 
-export class BinanceConnector implements IConnector<BinanceSetup> {
+export class BinanceConnector implements IConnector<ApiSecretSetup> {
 	/**
 	 * @injectable(modules.binance.connector)
 	 * @param client @inject(modules.binance.client)
@@ -139,7 +139,7 @@ export class BinanceConnector implements IConnector<BinanceSetup> {
 		return crypto.createHmac('sha256', credentials.secret).update(data).digest('hex')
 	}
 
-	async setup(accountId: number, data: BinanceSetup) {
+	async setup(accountId: number, data: ApiSecretSetup) {
 		const existing: BinanceCredentials = await BinanceCredentials.findOne({
 			where: {
 				account_id: accountId
@@ -159,9 +159,4 @@ export class BinanceConnector implements IConnector<BinanceSetup> {
 			})
 		}
 	}
-}
-
-type BinanceSetup = {
-	apiKey: string,
-	secret: string
 }

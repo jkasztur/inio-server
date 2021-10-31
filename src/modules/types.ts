@@ -8,3 +8,12 @@ export type Balance = {
 	amount: number,
 	currency: string
 }
+
+export type ApiSecretSetup = {
+	apiKey: string
+	secret: string
+}
+
+export type AddressSetup = {
+	address: string
+}

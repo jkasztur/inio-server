@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize-typescript";
 import { Account } from "./models/Account";
+import { Address } from "./models/Address";
 import { BinanceCredentials } from "./models/BinanceCredentials";
 import { KrakenCredentials } from "./models/KrakenCredentials";
 
@@ -29,7 +30,8 @@ export function createDatabaseClient(): Sequelize {
 	client.addModels([
 		Account,
 		KrakenCredentials,
-		BinanceCredentials
+		BinanceCredentials,
+		Address
 	])
 	return client
 }

@@ -1,10 +1,10 @@
-import { IConnector } from "../types";
+import { ApiSecretSetup, IConnector } from "../types";
 import { AxiosInstance } from "axios";
 import crypto from 'crypto'
 import { KrakenCredentials } from "../../database/models/KrakenCredentials";
 import { CurrencyService } from "../../app/currencyService";
 
-export class KrakenConnector implements IConnector<KrakenSetup> {
+export class KrakenConnector implements IConnector<ApiSecretSetup> {
 
 	/**
 	 * @injectable(modules.kraken.connector)
@@ -56,7 +56,7 @@ export class KrakenConnector implements IConnector<KrakenSetup> {
 		}
 	}
 
-	async setup(accountId: number, data: KrakenSetup) {
+	async setup(accountId: number, data: ApiSecretSetup) {
 		const existing: KrakenCredentials = await KrakenCredentials.findOne({
 			where: {
 				account_id: accountId
@@ -100,9 +100,4 @@ type TradeBalanceResponse = {
 	result: {
 		[key: string]: string
 	}
-}
-
-type KrakenSetup = {
-	apiKey: string,
-	secret: string
 }
