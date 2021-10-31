@@ -1,6 +1,6 @@
 
 export interface IConnector<SetupData = object> {
-	getBalance(accountId: number): Promise<Balance>
+	getBalance(accountId: number, currency: string): Promise<Balance>
 	setup(accountId: number, data: SetupData): Promise<void>
 }
 

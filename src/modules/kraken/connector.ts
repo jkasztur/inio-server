@@ -2,18 +2,20 @@ import { IConnector } from "../types";
 import { AxiosInstance } from "axios";
 import crypto from 'crypto'
 import { KrakenCredentials } from "../../database/models/KrakenCredentials";
+import { CurrencyService } from "../../app/currencyService";
 
 export class KrakenConnector implements IConnector<KrakenSetup> {
 
 	/**
 	 * @injectable(modules.kraken.connector)
 	 * @param client @inject(clients.kraken)
+	 * @param currencyService @inject(app.currencyService)
 	 */
-	constructor(private client: AxiosInstance) {
+	constructor(private client: AxiosInstance, private currencyService: CurrencyService) {
 	}
 
-	async getBalance(accountId: number) {
-		const credentials = await KrakenCredentials.findOne({
+	async getBalance(accountId: number, currency: string) {
+		const credentials: KrakenCredentials = await KrakenCredentials.findOne({
 			where: {
 				account_id: accountId
 			}
@@ -37,9 +39,20 @@ export class KrakenConnector implements IConnector<KrakenSetup> {
 			}
 		})
 
+		if (response.data.error && response.data.error.length > 0) {
+			throw new Error(`Kraken error: ${response.data.error}`)
+		}
+
+		const usdAmount = this.sumBalances(response.data)
+		let amount: number
+		if (currency === 'usd') {
+			amount = usdAmount
+		} else {
+			amount = await this.currencyService.convert(usdAmount, 'usd', currency)
+		}
 		return {
-			amount: this.sumBalances(response.data),
-			currency: 'USD'
+			amount,
+			currency
 		}
 	}
 
