@@ -3,10 +3,9 @@ import { AxiosInstance } from "axios";
 import { CurrencyService } from "../../app/currencyService";
 import crypto from 'crypto'
 import qs from "qs";
+import { BinanceCredentials } from "../../database/models/BinanceCredentials";
 
 export class BinanceConnector implements IConnector<BinanceSetup> {
-	apiKey: string = ''
-	secret: string = ''
 	/**
 	 * @injectable(modules.binance.connector)
 	 * @param client @inject(modules.binance.client)
@@ -16,13 +15,21 @@ export class BinanceConnector implements IConnector<BinanceSetup> {
 	}
 
 	async getBalance(accountId: number, currency: string) {
-		const spotBalance = await this.getSpotBalance()
-		const savingsBalance = await this.getSavingsBalance()
-		const marginBalance = await this.getMarginBalance()
+		const credentials: BinanceCredentials = await BinanceCredentials.findOne({
+			where: {
+				account_id: accountId
+			}
+		})
+		if (!credentials) {
+			return {
+				amount: -1,
+				currency: 'USD'
+			}
+		}
 
-
-		console.log({ spotBalance, savingsBalance, marginBalance });
-
+		const spotBalance = await this.getSpotBalance(credentials)
+		const savingsBalance = await this.getSavingsBalance(credentials)
+		const marginBalance = await this.getMarginBalance(credentials)
 
 		const totalInUSDT = spotBalance + savingsBalance + marginBalance
 		const converted = await this.currencyService.convert(totalInUSDT, 'USD', currency)
@@ -32,15 +39,15 @@ export class BinanceConnector implements IConnector<BinanceSetup> {
 		}
 	}
 
-	private async getMarginBalance(): Promise<number> {
+	private async getMarginBalance(credentials: BinanceCredentials): Promise<number> {
 		const timestamp = new Date().getTime()
 		const params = {
 			timestamp
 		}
-		const signature = this.getApiSign(params)
+		const signature = this.getApiSign(params, credentials)
 		const response = await this.client.get('/sapi/v1/margin/isolated/account', {
 			headers: {
-				'X-MBX-APIKEY': this.apiKey
+				'X-MBX-APIKEY': credentials.api_key
 			},
 			params: {
 				...params,
@@ -65,15 +72,15 @@ export class BinanceConnector implements IConnector<BinanceSetup> {
 		return total
 	}
 
-	private async getSavingsBalance(): Promise<number> {
+	private async getSavingsBalance(credentials: BinanceCredentials): Promise<number> {
 		const timestamp = new Date().getTime()
 		const params = {
 			timestamp
 		}
-		const signature = this.getApiSign(params)
+		const signature = this.getApiSign(params, credentials)
 		const response = await this.client.get('/sapi/v1/lending/union/account', {
 			headers: {
-				'X-MBX-APIKEY': this.apiKey
+				'X-MBX-APIKEY': credentials.api_key
 			},
 			params: {
 				...params,
@@ -88,15 +95,15 @@ export class BinanceConnector implements IConnector<BinanceSetup> {
 		return total
 	}
 
-	private async getSpotBalance() {
+	private async getSpotBalance(credentials: BinanceCredentials) {
 		const timestamp = new Date().getTime()
 		const params = {
 			timestamp
 		}
-		const signature = this.getApiSign(params)
+		const signature = this.getApiSign(params, credentials)
 		const response = await this.client.get('/api/v3/account', {
 			headers: {
-				'X-MBX-APIKEY': this.apiKey
+				'X-MBX-APIKEY': credentials.api_key
 			},
 			params: {
 				...params,
@@ -131,9 +138,6 @@ export class BinanceConnector implements IConnector<BinanceSetup> {
 		}
 		const response = await this.client.get('/api/v3/avgPrice', {
 			validateStatus: (status) => true,
-			headers: {
-				'X-MBX-APIKEY': this.apiKey
-			},
 			params: {
 				symbol: `${symbol}USDT`
 			}
@@ -145,13 +149,13 @@ export class BinanceConnector implements IConnector<BinanceSetup> {
 		}
 	}
 
-	private getApiSign(query: any): string {
+	private getApiSign(query: any, credentials: BinanceCredentials): string {
 		const data = qs.stringify(query)
-		return crypto.createHmac('sha256', this.secret).update(data).digest('hex')
+		return crypto.createHmac('sha256', credentials.secret).update(data).digest('hex')
 	}
 
-	async setup(accountId: number, data: BinanceSetup) {/*
-		const existing: KrakenCredentials = await KrakenCredentials.findOne({
+	async setup(accountId: number, data: BinanceSetup) {
+		const existing: BinanceCredentials = await BinanceCredentials.findOne({
 			where: {
 				account_id: accountId
 			}
@@ -163,15 +167,13 @@ export class BinanceConnector implements IConnector<BinanceSetup> {
 				secret: data.secret
 			})
 		} else {
-			await KrakenCredentials.create({
+			await BinanceCredentials.create({
 				account_id: accountId,
 				api_key: data.apiKey,
 				secret: data.secret
 			})
-		}*/
+		}
 	}
-
-
 }
 
 type BinanceSetup = {
