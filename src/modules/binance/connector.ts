@@ -4,14 +4,19 @@ import { CurrencyService } from "../../app/currencyService";
 import crypto from 'crypto'
 import qs from "qs";
 import { BinanceCredentials } from "../../database/models/BinanceCredentials";
+import { BinanceService } from "./service";
 
 export class BinanceConnector implements IConnector<BinanceSetup> {
 	/**
 	 * @injectable(modules.binance.connector)
 	 * @param client @inject(modules.binance.client)
 	 * @param currencyService @inject(app.currencyService)
+	 * @param binanceService @inject(modules.binance.service)
 	 */
-	constructor(private client: AxiosInstance, private currencyService: CurrencyService) {
+	constructor(
+		private client: AxiosInstance,
+		private currencyService: CurrencyService,
+		private binanceService: BinanceService) {
 	}
 
 	async getBalance(accountId: number, currency: string) {
@@ -62,7 +67,7 @@ export class BinanceConnector implements IConnector<BinanceSetup> {
 				total += quoteAsset
 			}
 			if (baseAmount > 0) {
-				const converted = await this.getAveragePrice(asset.baseAsset.asset, baseAmount)
+				const converted = await this.binanceService.getAveragePrice(asset.baseAsset.asset, baseAmount)
 				console.log(converted);
 
 				total += converted
@@ -122,31 +127,11 @@ export class BinanceConnector implements IConnector<BinanceSetup> {
 
 		let total = 0
 		for (const balance of balances) {
-			const converted = await this.getAveragePrice(balance.asset, balance.free)
+			const converted = await this.binanceService.getAveragePrice(balance.asset, balance.free)
 			total += converted
 		}
 
 		return total
-	}
-
-	private async getAveragePrice(symbol: string, amount: number): Promise<number> {
-		if (amount === 0) {
-			return 0
-		}
-		if (symbol === 'USDT') {
-			return amount
-		}
-		const response = await this.client.get('/api/v3/avgPrice', {
-			validateStatus: (status) => true,
-			params: {
-				symbol: `${symbol}USDT`
-			}
-		})
-		if (response.data.price) {
-			return amount * Number.parseFloat(response.data.price)
-		} else {
-			return 0
-		}
 	}
 
 	private getApiSign(query: any, credentials: BinanceCredentials): string {
