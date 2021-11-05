@@ -43,8 +43,8 @@ export function createAuthRouter(authService: AuthService): Router {
 		if (result.status === LoginStatus.InvalidPassword) {
 			ctx.throw('Invalid password', 403)
 		}
-		ctx.cookies.set('accessToken', result.accessToken)
-		ctx.send({ accessToken: result.accessToken }, 200)
+		ctx.cookies.set('accessToken', result.accessToken, { domain: process.env.DOMAIN })
+		ctx.send({ accessToken: result.accessToken, accountId: result.accountId }, 200)
 	})
 
 	return router
