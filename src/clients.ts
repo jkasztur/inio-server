@@ -23,6 +23,6 @@ export function createBinanceClient() {
  */
 export function createEthClient() {
 	return axios.create({
-		baseURL: 'https://api1.binance.com'
+		baseURL: 'https://api.etherscan.io/api'
 	})
 }

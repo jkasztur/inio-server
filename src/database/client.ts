@@ -3,6 +3,7 @@ import { Account } from "./models/Account";
 import { Address } from "./models/Address";
 import { BinanceCredentials } from "./models/BinanceCredentials";
 import { KrakenCredentials } from "./models/KrakenCredentials";
+import { WhitelistedContract } from "./models/WhitelistedContract";
 
 /**
  * @injectable(database.client)
@@ -31,7 +32,8 @@ export function createDatabaseClient(): Sequelize {
 		Account,
 		KrakenCredentials,
 		BinanceCredentials,
-		Address
+		Address,
+		WhitelistedContract
 	])
 	return client
 }

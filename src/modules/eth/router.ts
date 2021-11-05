@@ -5,12 +5,13 @@ import { IConnector } from "../types";
 import auth from "../../http/middleware/auth";
 import validate from "../../http/middleware/validate";
 import { Context } from "../../http/types";
+import { EthereumChainConnector } from "./connector";
 
 /**
  * @injectable(http.router.eth)
  * @param connector @inject(modules.eth.connector)
  */
-export function createMainRouter(connector: IConnector): Router {
+export function createMainRouter(connector: EthereumChainConnector): Router {
 	const router = new Router({
 		prefix: '/eth'
 	})
@@ -31,6 +32,15 @@ export function createMainRouter(connector: IConnector): Router {
 		}
 	}), async (ctx: Context) => {
 		await connector.setup(Number.parseInt(ctx.headers['x-account-id'] as string), ctx.request.body)
+		ctx.send(null, 200)
+	})
+
+	router.post('/whitelist', validate({
+		body: {
+			contract: Joi.string().required()
+		}
+	}), async (ctx: Context) => {
+		await connector.whitelist(Number.parseInt(ctx.headers['x-account-id'] as string), ctx.request.body.contract)
 		ctx.send(null, 200)
 	})
 

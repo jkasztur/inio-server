@@ -31,10 +31,10 @@ export class BinanceConnector implements IConnector<ApiSecretSetup> {
 				currency: 'USD'
 			}
 		}
-
-		const spotBalance = await this.getSpotBalance(credentials)
-		const savingsBalance = await this.getSavingsBalance(credentials)
-		const marginBalance = await this.getMarginBalance(credentials)
+		const [spotBalance, savingsBalance, marginBalance] = await Promise.all([
+			this.getSpotBalance(credentials),
+			this.getSavingsBalance(credentials),
+			this.getMarginBalance(credentials)])
 
 		const totalInUSDT = spotBalance + savingsBalance + marginBalance
 		const converted = await this.currencyService.convert(totalInUSDT, 'USD', currency)
