@@ -26,3 +26,11 @@ export function createEthClient() {
 		baseURL: 'https://api.etherscan.io/api'
 	})
 }
+/**
+ * @injectable(clients.coingecko)
+ */
+export function createCoingeckoClient() {
+	return axios.create({
+		baseURL: 'https://api.coingecko.com/api'
+	})
+}

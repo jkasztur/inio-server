@@ -37,10 +37,10 @@ export function createMainRouter(connector: EthereumChainConnector): Router {
 
 	router.post('/whitelist', validate({
 		body: {
-			contract: Joi.string().required()
+			address: Joi.string().required()
 		}
 	}), async (ctx: Context) => {
-		await connector.whitelist(Number.parseInt(ctx.headers['x-account-id'] as string), ctx.request.body.contract)
+		await connector.whitelist(Number.parseInt(ctx.headers['x-account-id'] as string), ctx.request.body)
 		ctx.send(null, 200)
 	})
 

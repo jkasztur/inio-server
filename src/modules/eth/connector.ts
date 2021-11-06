@@ -6,6 +6,7 @@ import { CurrencyService } from "../../app/currencyService";
 import { Address } from "../../database/models/Address";
 import { BinanceService } from "../binance/service";
 import { WhitelistedContract } from "../../database/models/WhitelistedContract";
+import { runInThisContext } from "vm";
 
 export const CHAIN_NAME = 'eth'
 export class EthereumChainConnector implements IConnector<AddressSetup> {
@@ -13,10 +14,12 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 	/**
 	 * @injectable(modules.eth.connector)
 	 * @param client @inject(modules.eth.client)
+	 * @param coingeckoClient @inject(clients.coingecko)
 	 * @param currencyService @inject(app.currencyService)
 	 */
 	constructor(
-		private client: AxiosInstance,
+		private etherscanClient: AxiosInstance,
+		private coingeckoClient: AxiosInstance,
 		private currencyService: CurrencyService) {
 	}
 
@@ -33,20 +36,56 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 				currency: 'USD'
 			}
 		}
-		const whitelistedContracts = [] // TODO
-
+		// ETH
 		const ethBalance = await this.getEthBalance(address)
 		const ethPrice = await this.getEthPrice()
 		const ethInUsd = ethBalance * ethPrice
-		const converted = await this.currencyService.convert(ethInUsd, 'USD', currency)
+
+		// Other contracts
+		const contractsInUsd = await this.getContractsInUsd(address)
+
+		const converted = await this.currencyService.convert(ethInUsd + contractsInUsd, 'USD', currency)
 		return {
 			amount: converted,
 			currency
 		}
 	}
 
+	async getContractsInUsd(address: Address): Promise<number> {
+		const contracts: WhitelistedContract[] = await WhitelistedContract.findAll({
+			where: {
+				address_id: address.id,
+			}
+		})
+		if (contracts.length === 0) {
+			return 0
+		}
+		let usdAmount = 0
+
+		await Promise.all(contracts.map(async (contract) => {
+			const balanceResponse = await this.etherscanClient('/', {
+				params: {
+					module: 'account',
+					action: 'tokenbalance',
+					address: address.address,
+					contractaddress: contract.contract,
+					apiKey: process.env.ETHERSCAN_API_KEY
+				}
+			})
+			const weiCount = parseFloat(balanceResponse.data.result)
+			const tokenCount = weiCount / parseFloat('1000000000000000000')
+			if (tokenCount === 0) {
+				return
+			}
+			const tokenPrice = await this.getContractPrice(contract.contract)
+			usdAmount += (tokenPrice * tokenCount)
+		}))
+
+		return usdAmount
+	}
+
 	async getEthBalance(address: Address): Promise<number> {
-		const response = await this.client('/', {
+		const response = await this.etherscanClient('/', {
 			params: {
 				module: 'account',
 				action: 'balance',
@@ -60,8 +99,19 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 		return ethCount
 	}
 
+	async getContractPrice(contractAddress: string): Promise<number> {
+		const response = await this.coingeckoClient.get('/v3/simple/token_price/ethereum', {
+			params: {
+				contract_addresses: contractAddress,
+				vs_currencies: 'usd'
+			}
+		})
+
+		return Object.values(response.data)[0]['usd']
+	}
+
 	async getEthPrice(): Promise<number> {
-		const response = await this.client('/', {
+		const response = await this.etherscanClient('/', {
 			params: {
 				module: 'stats',
 				action: 'ethprice',
@@ -92,7 +142,7 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 		}
 	}
 
-	async whitelist(accountId: number, contract: string) {
+	async whitelist(accountId: number, data: AddressSetup) {
 		const address: Address = await Address.findOne({
 			where: {
 				account_id: accountId,
@@ -106,7 +156,7 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 		const existing: WhitelistedContract = await WhitelistedContract.findOne({
 			where: {
 				address_id: address.id,
-				contract
+				contract: data.address
 			}
 		})
 		if (existing) {
@@ -114,7 +164,7 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 		}
 		await WhitelistedContract.create({
 			address_id: address.id,
-			contract
+			contract: data.address
 		})
 	}
 }
