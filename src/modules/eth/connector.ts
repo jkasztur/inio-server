@@ -187,7 +187,7 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 		return existing.map(contract => contract.contract)
 	}
 
-	async removeWhitelisted(accountId: number, data: AddressSetup) {
+	async removeWhitelisted(accountId: number, contractAddress: string) {
 		const address: Address = await Address.findOne({
 			where: {
 				account_id: accountId,
@@ -201,7 +201,7 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 		await WhitelistedContract.destroy({
 			where: {
 				address_id: address.id,
-				contract: data.address
+				contract: contractAddress
 			}
 		})
 	}
