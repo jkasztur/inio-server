@@ -4,17 +4,17 @@ import { CurrencyService } from "../../app/currencyService";
 import { Address } from "../../database/models/Address";
 import { WhitelistedContract } from "../../database/models/WhitelistedContract";
 
-export const CHAIN_NAME = 'eth'
-export class EthereumChainConnector implements IConnector<AddressSetup> {
+export const CHAIN_NAME = 'bsc'
+export class BscConnector implements IConnector<AddressSetup> {
 
 	/**
-	 * @injectable(modules.eth.connector)
-	 * @param client @inject(modules.eth.client)
+	 * @injectable(modules.bsc.connector)
+	 * @param bscClient @inject(modules.bsc.client)
 	 * @param coingeckoClient @inject(clients.coingecko)
 	 * @param currencyService @inject(app.currencyService)
 	 */
 	constructor(
-		private etherscanClient: AxiosInstance,
+		private bscClient: AxiosInstance,
 		private coingeckoClient: AxiosInstance,
 		private currencyService: CurrencyService) {
 	}
@@ -32,15 +32,17 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 				currency: 'USD'
 			}
 		}
-		// ETH
-		const ethBalance = await this.getEthBalance(address)
-		const ethPrice = await this.getEthPrice()
-		const ethInUsd = ethBalance * ethPrice
+		// BNB
+		const bnbBalance = await this.getBnbBalance(address)
+		const bnbPrice = await this.getBnbPrice()
+		const bnbInUsd = bnbBalance * bnbPrice
 
 		// Other contracts
 		const contractsInUsd = await this.getContractsInUsd(address)
+		console.log(contractsInUsd);
 
-		const converted = await this.currencyService.convert(ethInUsd + contractsInUsd, 'USD', currency)
+
+		const converted = await this.currencyService.convert(bnbInUsd + contractsInUsd, 'USD', currency)
 		return {
 			amount: converted,
 			currency
@@ -59,13 +61,13 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 		let usdAmount = 0
 
 		await Promise.all(contracts.map(async (contract) => {
-			const balanceResponse = await this.etherscanClient('/', {
+			const balanceResponse = await this.bscClient('/', {
 				params: {
 					module: 'account',
 					action: 'tokenbalance',
 					address: address.address,
 					contractaddress: contract.contract,
-					apiKey: process.env.ETHERSCAN_API_KEY
+					apiKey: process.env.BSCSCAN_API_KEY
 				}
 			})
 			const weiCount = parseFloat(balanceResponse.data.result)
@@ -80,23 +82,23 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 		return usdAmount
 	}
 
-	async getEthBalance(address: Address): Promise<number> {
-		const response = await this.etherscanClient('/', {
+	async getBnbBalance(address: Address): Promise<number> {
+		const response = await this.bscClient('/', {
 			params: {
 				module: 'account',
 				action: 'balance',
 				address: address.address,
-				apiKey: process.env.ETHERSCAN_API_KEY
+				apiKey: process.env.BSCSCAN_API_KEY
 			}
 		})
 		const weiCount = parseFloat(response.data.result)
-		const ethCount = weiCount / parseFloat('1000000000000000000')
+		const bnbCount = weiCount / parseFloat('1000000000000000000')
 
-		return ethCount
+		return bnbCount
 	}
 
 	async getContractPrice(contractAddress: string): Promise<number> {
-		const response = await this.coingeckoClient.get('/v3/simple/token_price/ethereum', {
+		const response = await this.coingeckoClient.get('/v3/simple/token_price/binance-smart-chain', {
 			params: {
 				contract_addresses: contractAddress,
 				vs_currencies: 'usd'
@@ -106,14 +108,15 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 		return Object.values(response.data)[0]['usd']
 	}
 
-	async getEthPrice(): Promise<number> {
-		const response = await this.etherscanClient('/', {
+	async getBnbPrice(): Promise<number> {
+		const response = await this.bscClient('/', {
 			params: {
 				module: 'stats',
-				action: 'ethprice',
-				apiKey: process.env.ETHERSCAN_API_KEY
+				action: 'bnbprice',
+				apiKey: process.env.BSCSCAN_API_KEY
 			}
 		})
+
 		return parseFloat(response.data.result.ethusd)
 	}
 

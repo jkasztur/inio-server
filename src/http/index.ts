@@ -12,9 +12,10 @@ import log from './middleware/log'
  * @param kraken @inject(http.router.kraken)
  * @param binance @inject(http.router.binance)
  * @param eth @inject(http.router.eth)
+ * @param bsc @inject(http.router.bsc)
  * @param fallback @inject(http.router.fallback)
  */
-export function createKoa(main: Router, auth: Router, kraken: Router, binance: Router, eth: Router, fallback: Router): Koa {
+export function createKoa(main: Router, auth: Router, kraken: Router, binance: Router, eth: Router, bsc: Router, fallback: Router): Koa {
 	const app = new Koa<Koa.DefaultState, BaseContext>()
 	decorateContext(app.context)
 	app.use(log())
@@ -33,6 +34,7 @@ export function createKoa(main: Router, auth: Router, kraken: Router, binance: R
 	app.use(kraken.routes())
 	app.use(binance.routes())
 	app.use(eth.routes())
+	app.use(bsc.routes())
 
 	app.use(fallback.routes())
 
