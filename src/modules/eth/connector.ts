@@ -167,4 +167,42 @@ export class EthereumChainConnector implements IConnector<AddressSetup> {
 			contract: data.address
 		})
 	}
+
+	async getWhitelisted(accountId: number): Promise<string[]> {
+		const address: Address = await Address.findOne({
+			where: {
+				account_id: accountId,
+				chain: CHAIN_NAME
+			}
+		})
+		if (!address) {
+			return []
+		}
+		const existing: WhitelistedContract[] = await WhitelistedContract.findAll({
+			where: {
+				address_id: address.id
+			}
+		})
+
+		return existing.map(contract => contract.contract)
+	}
+
+	async removeWhitelisted(accountId: number, data: AddressSetup) {
+		const address: Address = await Address.findOne({
+			where: {
+				account_id: accountId,
+				chain: CHAIN_NAME
+			}
+		})
+		if (!address) {
+			return
+		}
+
+		await WhitelistedContract.destroy({
+			where: {
+				address_id: address.id,
+				contract: data.address
+			}
+		})
+	}
 }

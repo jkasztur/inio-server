@@ -44,5 +44,23 @@ export function createMainRouter(connector: EthereumChainConnector): Router {
 		ctx.send(null, 200)
 	})
 
+	router.delete('/whitelist', validate({
+		body: {
+			address: Joi.string().required()
+		}
+	}), async (ctx: Context) => {
+		await connector.removeWhitelisted(Number.parseInt(ctx.headers['x-account-id'] as string), ctx.request.body)
+		ctx.send(null, 200)
+	})
+
+	router.get('/whitelist', validate({
+		body: {
+			address: Joi.string().required()
+		}
+	}), async (ctx: Context) => {
+		const addresses: string[] = await connector.getWhitelisted(Number.parseInt(ctx.headers['x-account-id'] as string))
+		ctx.send({ addresses }, 200)
+	})
+
 	return router
 }
