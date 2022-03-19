@@ -44,3 +44,12 @@ export function createBscClient() {
 		baseURL: 'https://api.bscscan.com/api'
 	})
 }
+
+/**
+ * @injectable(modules.avax.client)
+ */
+export function createAvaxClient() {
+	return axios.create({
+		baseURL: 'https://api.avax.network'
+	})
+}

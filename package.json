@@ -2,7 +2,7 @@
 	"name": "inio-server",
 	"version": "1.0.0",
 	"engines": {
-		"node": "14.8.0"
+		"node": "14.18.0"
 	},
 	"repository": {
 		"type": "git",
