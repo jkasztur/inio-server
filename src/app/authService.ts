@@ -51,7 +51,7 @@ export class AuthService {
 	}
 
 	private async createAccessToken(accountId: number): Promise<string> {
-		return 'access-token'
+		return 'access-token' // TODO
 	}
 }
 
